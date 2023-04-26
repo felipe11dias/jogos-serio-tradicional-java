@@ -8,8 +8,10 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -18,28 +20,33 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final LogoutHandler logoutHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .csrf()
-                .disable()
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
                 .authorizeHttpRequests()
-                    .requestMatchers("/api/v1/auth/**")
+                    .requestMatchers("/api/v1/auth/**", "/api/v1/users/**")
                         .permitAll()
                     .requestMatchers("/api/v1/ranking/**")
-                        .hasRole(Role.STUDENT.name())
+                        .hasAuthority(Role.STUDENT.name())
                     .requestMatchers("/api/v1/disciplines/**", "/api/v1/activities/**")
-                        .hasRole(Role.TEACHER.name())
-                .anyRequest().authenticated()
+                        .hasAuthority(Role.TEACHER.name())
+                .anyRequest()
+                    .authenticated()
                 .and()
                     .sessionManagement()
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authenticationProvider(authenticationProvider)
-                        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout()
+                .logoutUrl("/api/v1/auth/logout")
+                .addLogoutHandler(logoutHandler)
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+        ;
 
-
-        return httpSecurity.build();
+        return http.build();
     }
 }

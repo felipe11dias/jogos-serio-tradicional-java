@@ -1,7 +1,6 @@
 package br.unifor.enviromentgameserius.tcc.rest.controller;
 
-import br.unifor.enviromentgameserius.tcc.domain.model.User;
-import br.unifor.enviromentgameserius.tcc.rest.dto.UserPerfilResponse;
+import br.unifor.enviromentgameserius.tcc.rest.dto.UserProfileResponse;
 import br.unifor.enviromentgameserius.tcc.rest.dto.UserRegisterRequest;
 import br.unifor.enviromentgameserius.tcc.rest.dto.UserRegisterResponse;
 import br.unifor.enviromentgameserius.tcc.rest.service.UserService;
@@ -23,25 +22,21 @@ public class UserController {
 
     private final UserService service;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserPerfilResponse> perfil(@PathVariable(value = "id") Long id, @RequestHeader String token) {
-
-        User userPerfil = service.getUser(id)
-                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User from id not found."));
-
-        User userToken = service.getUserFromToken(token)
+    @GetMapping("profile")
+    public ResponseEntity<UserProfileResponse> profile(
+            @RequestHeader(name="authorization") String token
+    ) {
+        var user = service.getUserFromToken(token)
                 .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User from token not found."));
 
-        if(!userPerfil.getEmail().equals(userToken.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-        }
-        UserPerfilResponse userPerfilResponse = UserPerfilResponse.builder()
-                .name(userToken.getName())
-                .email(userToken.getEmail())
+        UserProfileResponse userProfileResponse = UserProfileResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole().name())
                 .build();
 
-        return ResponseEntity.ok(userPerfilResponse);
-
+        return ResponseEntity.ok(userProfileResponse);
     }
 
     @PostMapping("/register")

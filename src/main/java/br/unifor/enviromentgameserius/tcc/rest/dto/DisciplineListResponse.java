@@ -6,13 +6,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DisciplineListResponse {
 
-    private List<Discipline> disciplines;
+    private Long id;
+    private String name;
+    private String theme;
+    private String user;
+    private Long idUser;
+
+    public DisciplineListResponse(Discipline discipline) {
+        this.id = discipline.getId();
+        this.name = discipline.getName();
+        this.theme = discipline.getTheme();
+        this.user = discipline.getUser().getName();
+        this.idUser = discipline.getUser().getId();
+    }
 }

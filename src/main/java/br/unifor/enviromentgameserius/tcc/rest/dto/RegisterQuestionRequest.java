@@ -1,7 +1,6 @@
 package br.unifor.enviromentgameserius.tcc.rest.dto;
 
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,18 +12,14 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ActivityRegisterRequest {
+public class RegisterQuestionRequest {
 
     @NotEmpty
-    private String name;
-
-    @NotNull
-    private Long idDiscipline;
-
-    @NotNull
-    private Long idUser;
+    private String description;
 
     @NotEmpty
-    private List<RegisterQuestionRequest> questions;
+    private List<AnswerRegisterRequest> answers;
 
+    @NotEmpty
+    private Long idAnswerCorrect;
 }

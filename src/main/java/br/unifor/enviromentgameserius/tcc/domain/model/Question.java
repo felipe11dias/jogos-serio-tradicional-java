@@ -5,15 +5,17 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "QUESTION")
+@Table(name = "\"QUESTION\"")
 public class Question {
 
     @Id
@@ -22,16 +24,14 @@ public class Question {
     private Long id;
 
     @NotEmpty
-    @Column(name = "description")
     private String description;
 
-    @NotNull
-    @Column(name = "answer")
-    @OneToMany(mappedBy = "question")
-    private List<Answer> answer;
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Answer> answers;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Questioner questioner;
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
+    private Activity activity;
 
     @NotNull
     @Column(name = "answer_correct_id")

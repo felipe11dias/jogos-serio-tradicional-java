@@ -18,6 +18,6 @@ public class DisciplineRegisterResponse {
     private Long id;
     private String name;
     private String theme;
+    private String user;
     private List<Activity> activities;
-    private Long idUser;
 }

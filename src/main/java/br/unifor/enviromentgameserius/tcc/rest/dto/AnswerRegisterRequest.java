@@ -1,5 +1,6 @@
 package br.unifor.enviromentgameserius.tcc.rest.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRegisterResponse {
+public class AnswerRegisterRequest {
 
-    private Long id;
-    private String accessToken;
-    private String refreshToken;
+    @NotEmpty
+    private String description;
 }

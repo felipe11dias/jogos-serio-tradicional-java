@@ -2,6 +2,7 @@ package br.unifor.enviromentgameserius.tcc.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "DISCIPLINE")
+@Table(name = "\"DISCIPLINE\"")
 public class Discipline {
 
     @Id
@@ -23,15 +24,17 @@ public class Discipline {
     private Long id;
 
     @NotEmpty
-    @Column(name = "name", unique = true)
+    @Column(unique = true)
     private String name;
 
     @NotEmpty
-    @Column(name = "theme")
     private String theme;
 
+    @OneToMany(mappedBy = "discipline", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Activity> activities;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "user_id")
     private User user;
 }

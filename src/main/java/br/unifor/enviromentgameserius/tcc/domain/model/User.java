@@ -23,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "USER")
+@Table(name = "\"USER\"")
 public class User implements UserDetails {
 
     @Id
@@ -34,7 +34,7 @@ public class User implements UserDetails {
     @NotBlank
     @NotEmpty
     @Email
-    @Column(name = "email", unique = true)
+    @Column(unique = true)
     private String email;
 
     @NotBlank
@@ -48,12 +48,15 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(role.toString()));
     }
 
     @Override

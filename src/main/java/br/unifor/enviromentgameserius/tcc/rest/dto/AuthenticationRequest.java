@@ -16,7 +16,7 @@ public class AuthenticationRequest {
 
     @NotEmpty
     @Email
-    private String email;
+    private String username;
 
     @NotEmpty
     @Length(min = 8)

@@ -8,13 +8,13 @@ import br.unifor.enviromentgameserius.tcc.rest.dto.DisciplineListResponse;
 import br.unifor.enviromentgameserius.tcc.rest.dto.DisciplineRegisterRequest;
 import br.unifor.enviromentgameserius.tcc.rest.dto.DisciplineRegisterResponse;
 import br.unifor.enviromentgameserius.tcc.rest.service.DisciplineService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,15 +22,16 @@ import java.util.Optional;
 public class DisciplineServiceImpl implements DisciplineService {
 
     private final DisciplineRepository repository;
-
     private final UserRepository userRepository;
 
     @Override
-    public Optional<List<Discipline>> list() {
-        return Optional.of(repository.findAll());
+    public Page<DisciplineListResponse> list(Pageable pagination) {
+        Page<Discipline> disciplines = repository.findAll(pagination);
+        return disciplines.map(DisciplineListResponse::new);
     }
 
     @Override
+    @Transactional
     public DisciplineRegisterResponse register(DisciplineRegisterRequest request, User user) {
         var discipline = Discipline.builder()
                 .name(request.getName())
@@ -45,13 +46,38 @@ public class DisciplineServiceImpl implements DisciplineService {
                 .id(discipline.getId())
                 .name(discipline.getName())
                 .theme(discipline.getTheme())
-                .idUser(discipline.getUser().getId())
+                .user(discipline.getUser().getName())
                 .activities(discipline.getActivities())
                 .build();
     }
 
     @Override
-        public DisciplineRegisterResponse details(Discipline discipline) {
+    public DisciplineRegisterResponse edit(Discipline discipline, DisciplineRegisterRequest request) {
+        discipline.setName(request.getName());
+        discipline.setTheme(request.getTheme());
+
+        repository.save(discipline);
+
+        return DisciplineRegisterResponse.builder()
+                .id(discipline.getId())
+                .name(discipline.getName())
+                .theme(discipline.getTheme())
+                .user(discipline.getUser().getName())
+                .activities(discipline.getActivities())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        Optional<Discipline> discipline = repository.findById(id);
+        if(discipline.isPresent()) {
+            repository.deleteById(id);
+        }
+    }
+
+    @Override
+    public DisciplineRegisterResponse details(Discipline discipline) {
 
         return DisciplineRegisterResponse.builder()
                 .id(discipline.getId())
@@ -63,12 +89,12 @@ public class DisciplineServiceImpl implements DisciplineService {
 
     @Override
     public Optional<Discipline> getDiscipline(Long id) {
-        return Optional.of(repository.findById(id).get());
+        return Optional.of(repository.findById(id)).get();
     }
 
     @Override
     public Optional<User> getUser(Long id) {
-        return Optional.of(userRepository.findById(id).get());
+        return Optional.of(userRepository.findById(id)).get();
     }
 
 }
