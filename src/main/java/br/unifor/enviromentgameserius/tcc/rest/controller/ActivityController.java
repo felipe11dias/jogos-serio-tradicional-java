@@ -35,10 +35,21 @@ public class ActivityController {
         return ResponseEntity.ok(service.list(pagination));
     }
 
+    @GetMapping("/discipline/{idDiscipline}")
+    public ResponseEntity<Page<ActivityListResponse>> listByDiscipline(@PathVariable(value = "idDiscipline") Long idDiscipline, @PageableDefault(sort = "id", direction = Sort.Direction.ASC, page = 0, size = 10) Pageable pagination) throws ResponseStatusException {
+        Discipline discipline = service.getDiscipline(idDiscipline)
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Discipline not found."));
+
+        return ResponseEntity.ok(service.listByDiscipline(discipline, pagination));
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Activity> getActivity(@PathVariable(value = "id") Long id) {
-        return ResponseEntity.ok(service.getActivity(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found.")));
+    public ResponseEntity<ActivityResponse> getActivity(@PathVariable(value = "id") Long id) {
+        Activity activity = service.getActivity(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found."));
+
+        ActivityResponse response = new ActivityResponse(activity);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("register")
@@ -47,7 +58,7 @@ public class ActivityController {
             @Valid @RequestBody ActivityRegisterRequest request,
             UriComponentsBuilder uriBuilder
     ) {
-        Discipline discipline = service.getDiscipline(request.getIdDiscipline())
+        Discipline discipline = service.getDiscipline(Long.valueOf(request.getIdDiscipline()))
                 .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity register invalid. Discipline not found."));
 
         User user = service.getUser(request.getIdUser())
@@ -63,12 +74,12 @@ public class ActivityController {
     public ResponseEntity<ActivityRegisterResponse> edit(
             @RequestHeader(name="authorization") String token,
             @PathVariable(value = "id") Long id,
-            @Valid @RequestBody ActivityRegisterRequest request
+            @Valid @RequestBody ActivityEditRequest request
     ) throws ResponseStatusException {
         Activity activity = service.getActivity(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found."));
 
-        Discipline discipline = service.getDiscipline(request.getIdDiscipline())
+        Discipline discipline = service.getDiscipline(Long.valueOf(request.getIdDiscipline()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Discipline not found."));
 
         User user = userService.getUserFromToken(token)
