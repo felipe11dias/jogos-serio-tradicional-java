@@ -13,7 +13,7 @@ public interface AuthenticationService {
 
     void revokeAllUserTokens(User user);
 
-    void refreshToken(
+    AuthenticationResponse refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
     );

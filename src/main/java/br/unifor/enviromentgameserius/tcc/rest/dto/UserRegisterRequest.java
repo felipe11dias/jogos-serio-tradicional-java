@@ -1,7 +1,7 @@
 package br.unifor.enviromentgameserius.tcc.rest.dto;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,14 +14,17 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 public class UserRegisterRequest {
 
-    @NotEmpty
+    private String role;
+
+    @NotNull(message = "O nome não pode ser vazio.")
+    @Length(min = 3, message = "O nome deve ter no minimo três caracters.")
     private String name;
 
-    @NotEmpty
+    @NotNull(message = "O email não pode ser vazio.")
     @Email
     private String email;
 
-    @NotEmpty
+    @NotNull(message = "A senha não pode ser vazia.")
     @Length(min = 8)
     private String password;
 

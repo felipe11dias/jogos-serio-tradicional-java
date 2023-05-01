@@ -38,7 +38,7 @@ public class ActivityController {
     @GetMapping("/discipline/{idDiscipline}")
     public ResponseEntity<Page<ActivityListResponse>> listByDiscipline(@PathVariable(value = "idDiscipline") Long idDiscipline, @PageableDefault(sort = "id", direction = Sort.Direction.ASC, page = 0, size = 10) Pageable pagination) throws ResponseStatusException {
         Discipline discipline = service.getDiscipline(idDiscipline)
-                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Discipline not found."));
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada."));
 
         return ResponseEntity.ok(service.listByDiscipline(discipline, pagination));
     }
@@ -46,7 +46,7 @@ public class ActivityController {
     @GetMapping("/{id}")
     public ResponseEntity<ActivityResponse> getActivity(@PathVariable(value = "id") Long id) {
         Activity activity = service.getActivity(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade não encontrada."));
 
         ActivityResponse response = new ActivityResponse(activity);
         return ResponseEntity.ok(response);
@@ -59,10 +59,10 @@ public class ActivityController {
             UriComponentsBuilder uriBuilder
     ) {
         Discipline discipline = service.getDiscipline(Long.valueOf(request.getIdDiscipline()))
-                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity register invalid. Discipline not found."));
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade é inválida. Disciplina não encontrada."));
 
         User user = service.getUser(request.getIdUser())
-                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity register invalid. User not found."));
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade é inválida. Usuário não encontrado."));
 
         ActivityRegisterResponse activity = service.register(request, discipline, user);
         URI uri = uriBuilder.path("/api/v1/activities/{id}").buildAndExpand(activity.getId()).toUri();
@@ -77,16 +77,16 @@ public class ActivityController {
             @Valid @RequestBody ActivityEditRequest request
     ) throws ResponseStatusException {
         Activity activity = service.getActivity(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade não encontrada."));
 
         Discipline discipline = service.getDiscipline(Long.valueOf(request.getIdDiscipline()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Discipline not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada."));
 
         User user = userService.getUserFromToken(token)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found from this token."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token informado é inválido."));
 
         if(!Objects.equals(user.getId(), request.getIdUser())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "The logged in user forbidden.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário logado não tem permissão para essa ação.");
         }
 
         return ResponseEntity.ok().body(service.edit(activity, discipline, request));
@@ -99,13 +99,13 @@ public class ActivityController {
             @PathVariable(value = "id") Long id
     ) throws ResponseStatusException {
         Activity activity = service.getActivity(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade não encontrada."));
 
         User user = userService.getUserFromToken(token)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found from this token."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token informado é inválido."));
 
         if(!Objects.equals(user.getId(), activity.getUser().getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "The logged in user forbidden.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário logado não tem permissão para essa ação.");
         }
 
         service.delete(id);

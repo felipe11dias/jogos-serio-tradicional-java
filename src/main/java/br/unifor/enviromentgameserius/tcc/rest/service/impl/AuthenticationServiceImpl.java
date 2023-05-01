@@ -8,11 +8,10 @@ import br.unifor.enviromentgameserius.tcc.domain.repository.TokenRepository;
 import br.unifor.enviromentgameserius.tcc.domain.repository.UserRepository;
 import br.unifor.enviromentgameserius.tcc.rest.dto.AuthenticationRequest;
 import br.unifor.enviromentgameserius.tcc.rest.dto.AuthenticationResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import br.unifor.enviromentgameserius.tcc.rest.dto.RefreshTokenRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -72,17 +71,14 @@ public class AuthenticationServiceImpl {
         tokenRepository.saveAll(validUserTokens);
     }
 
-    public void refreshToken(
+    public AuthenticationResponse refreshToken(
+            RefreshTokenRequest body,
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String userEmail;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-            return;
-        }
-        refreshToken = authHeader.substring(7);
+        refreshToken = body.getRefreshToken();
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
             var user = this.repository.findByEmail(userEmail)
@@ -91,12 +87,16 @@ public class AuthenticationServiceImpl {
                 var accessToken = jwtService.generateToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
-                var authResponse = AuthenticationResponse.builder()
+                return AuthenticationResponse.builder()
+                        .userId(user.getId())
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .role(user.getRole().name())
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();
-                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+        return null;
     }
 }

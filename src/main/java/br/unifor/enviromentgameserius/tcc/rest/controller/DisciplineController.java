@@ -39,7 +39,7 @@ public class DisciplineController {
     @GetMapping("/{id}")
     public ResponseEntity<Discipline> details(@PathVariable(value = "id") Long id) throws ResponseStatusException {
         return ResponseEntity.ok(service.getDiscipline(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Discipline not found.")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada.")));
 
     }
 
@@ -50,7 +50,7 @@ public class DisciplineController {
             UriComponentsBuilder uriBuilder
     ) throws ResponseStatusException {
         User user = service.getUser(request.getIdUser())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Discipline register invalid. User not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina é inválida. Usuário fornecido não encontrado."));
 
         DisciplineRegisterResponse discipline = service.register(request, user);
         URI uri = uriBuilder.path("/api/v1/disciplines/{id}").buildAndExpand(discipline.getId()).toUri();
@@ -65,13 +65,13 @@ public class DisciplineController {
             @Valid @RequestBody DisciplineRegisterRequest request
     ) throws ResponseStatusException {
         Discipline discipline = service.getDiscipline(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Discipline not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada."));
 
         User user = userService.getUserFromToken(token)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found from this token."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token informado é inválido."));
 
         if(!Objects.equals(user.getId(), request.getIdUser())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "The logged in user forbidden.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário logado não tem permissão para essa ação.");
         }
 
         return ResponseEntity.ok().body(service.edit(discipline, request));
@@ -85,13 +85,13 @@ public class DisciplineController {
     ) throws ResponseStatusException {
 
         Discipline discipline = service.getDiscipline(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Discipline not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada."));
 
         User user = userService.getUserFromToken(token)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found from this token."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token informado é inválido."));
 
         if(!Objects.equals(user.getId(), discipline.getUser().getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "The logged in user forbidden.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário logado não tem permissão para essa ação.");
         }
 
         service.delete(id);

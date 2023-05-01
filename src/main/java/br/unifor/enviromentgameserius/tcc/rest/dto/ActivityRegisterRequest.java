@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -15,7 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class ActivityRegisterRequest {
 
-    @NotEmpty
+    @NotNull(message = "O nome não pode ser vazio.")
+    @Length(min = 3, message = "O nome da atividade deve ter no minimo três caracters.")
     private String name;
 
     @NotNull
