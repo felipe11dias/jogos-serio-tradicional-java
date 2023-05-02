@@ -10,9 +10,9 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,16 +31,37 @@ public class ActivityController {
     private final ActivityService service;
 
     @GetMapping()
-    public ResponseEntity<Page<ActivityListResponse>> list(@PageableDefault(sort = "id", direction = Sort.Direction.ASC, page = 0, size = 10) Pageable pagination) throws ResponseStatusException {
-        return ResponseEntity.ok(service.list(pagination));
+    public ResponseEntity<Page<ActivityListResponse>> list(
+            @RequestParam(value = "activity", required = false) String activity,
+            @RequestParam(value = "page", defaultValue = "0") int page
+    ) throws ResponseStatusException {
+        Pageable pagination = PageRequest.of(page, 10, Sort.by("id").ascending());
+
+        if(activity == null) {
+            Page<ActivityListResponse> activities = service.list(pagination);
+            return ResponseEntity.ok(activities);
+        }
+
+        return ResponseEntity.ok(service.listByName(activity, pagination));
     }
 
     @GetMapping("/discipline/{idDiscipline}")
-    public ResponseEntity<Page<ActivityListResponse>> listByDiscipline(@PathVariable(value = "idDiscipline") Long idDiscipline, @PageableDefault(sort = "id", direction = Sort.Direction.ASC, page = 0, size = 10) Pageable pagination) throws ResponseStatusException {
+    public ResponseEntity<Page<ActivityListResponse>> listByDiscipline(
+            @PathVariable(value = "idDiscipline") Long idDiscipline,
+            @RequestParam(value = "activity", required = false) String activity,
+            @RequestParam(value = "page", defaultValue = "0") int page
+    ) throws ResponseStatusException {
         Discipline discipline = service.getDiscipline(idDiscipline)
                 .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada."));
 
-        return ResponseEntity.ok(service.listByDiscipline(discipline, pagination));
+        Pageable pagination = PageRequest.of(page, 10, Sort.by("id").ascending());
+
+        if(activity == null) {
+            Page<ActivityListResponse> activities = service.listByDiscipline(discipline, pagination);
+            return ResponseEntity.ok(activities);
+        }
+
+        return ResponseEntity.ok(service.listByDisciplineAndName(discipline, activity, pagination));
     }
 
     @GetMapping("/{id}")

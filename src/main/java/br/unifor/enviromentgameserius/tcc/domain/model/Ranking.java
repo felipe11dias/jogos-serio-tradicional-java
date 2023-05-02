@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 @Data
 @Builder
@@ -26,11 +25,12 @@ public class Ranking {
     @NotNull
     private Timestamp time;
 
-    @ManyToOne
-    @JoinColumn(name = "questionsHit")
-    private List<Question> questionsHit;
+//    @OneToMany
+//    @JoinColumn(name = "questionsHit")
+//    private List<Question> questionsHit;
 
-    @ManyToOne
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "activity_id")
     private Activity activity;
 

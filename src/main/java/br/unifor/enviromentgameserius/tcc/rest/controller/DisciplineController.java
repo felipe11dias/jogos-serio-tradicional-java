@@ -11,9 +11,9 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -32,8 +33,23 @@ public class DisciplineController {
     private final DisciplineService service;
 
     @GetMapping()
-    public ResponseEntity<Page<DisciplineListResponse>> list(@PageableDefault(sort = "id", direction = Sort.Direction.ASC, page = 0, size = 10) Pageable pagination) throws ResponseStatusException {
-        return ResponseEntity.ok(service.list(pagination));
+    public ResponseEntity<Page<DisciplineListResponse>> list(
+            @RequestParam(value = "discipline", required = false) String discipline,
+            @RequestParam(value = "page", defaultValue = "0") int page
+    ) throws ResponseStatusException {
+        Pageable pagination = PageRequest.of(page, 10, Sort.by("id").ascending());
+
+        if(discipline == null) {
+            Page<DisciplineListResponse> disciplines = service.list(pagination);
+            return ResponseEntity.ok(disciplines);
+        }
+
+        return ResponseEntity.ok(service.listByName(discipline, pagination));
+    }
+
+    @GetMapping("selection")
+    public ResponseEntity<List<DisciplineListResponse>> listSelect() throws ResponseStatusException {
+        return ResponseEntity.ok(service.listToSelection());
     }
 
     @GetMapping("/{id}")

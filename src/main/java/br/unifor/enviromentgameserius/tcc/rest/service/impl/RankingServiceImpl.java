@@ -6,7 +6,6 @@ import br.unifor.enviromentgameserius.tcc.domain.model.Ranking;
 import br.unifor.enviromentgameserius.tcc.domain.model.User;
 import br.unifor.enviromentgameserius.tcc.domain.repository.QuestionRepository;
 import br.unifor.enviromentgameserius.tcc.domain.repository.RankingRepository;
-import br.unifor.enviromentgameserius.tcc.rest.dto.QuestionListResponse;
 import br.unifor.enviromentgameserius.tcc.rest.dto.RankingRegisterRequest;
 import br.unifor.enviromentgameserius.tcc.rest.dto.RankingRegisterResponse;
 import br.unifor.enviromentgameserius.tcc.rest.service.RankingService;
@@ -31,7 +30,7 @@ public class RankingServiceImpl implements RankingService {
     public RankingRegisterResponse register(RankingRegisterRequest request, List<Question> questions, User user, Activity activity) {
         Ranking ranking = Ranking.builder()
                 .time(request.getTime())
-                .questionsHit(questions)
+                //.questionsHit(questions)
                 .activity(activity)
                 .user(user)
                 .build();
@@ -42,7 +41,7 @@ public class RankingServiceImpl implements RankingService {
                 .time(ranking.getTime())
                 .activity(ranking.getActivity().getName())
                 .user(ranking.getUser().getName())
-                .questionsHit(ranking.getQuestionsHit().stream().map(QuestionListResponse::new).toList())
+                //.questionsHit(ranking.getQuestionsHit().stream().map(QuestionListResponse::new).toList())
                 .build();
     }
 

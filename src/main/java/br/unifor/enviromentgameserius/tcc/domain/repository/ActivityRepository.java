@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
-    Page<Activity> findByDiscipline(Discipline discipline, Pageable paginacao);
-
+    Page<Activity> findByDiscipline(Discipline discipline, Pageable pagination);
+    Page<Activity> findByNameContaining(String name, Pageable pagination);
+    Page<Activity> findByDisciplineAndName(Discipline discipline, String name, Pageable pagination);
 }

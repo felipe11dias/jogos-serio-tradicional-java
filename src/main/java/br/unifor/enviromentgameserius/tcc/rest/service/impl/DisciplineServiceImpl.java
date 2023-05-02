@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,12 @@ public class DisciplineServiceImpl implements DisciplineService {
     @Override
     public Page<DisciplineListResponse> list(Pageable pagination) {
         Page<Discipline> disciplines = repository.findAll(pagination);
+        return disciplines.map(DisciplineListResponse::new);
+    }
+
+    @Override
+    public Page<DisciplineListResponse> listByName(String discipline, Pageable pagination) {
+        Page<Discipline> disciplines = repository.findByNameContaining(discipline, pagination);
         return disciplines.map(DisciplineListResponse::new);
     }
 
@@ -90,6 +97,12 @@ public class DisciplineServiceImpl implements DisciplineService {
     @Override
     public Optional<Discipline> getDiscipline(Long id) {
         return Optional.of(repository.findById(id)).get();
+    }
+
+    @Override
+    public List<DisciplineListResponse> listToSelection() {
+        List<Discipline> disciplines = repository.findAll();
+        return disciplines.stream().map(DisciplineListResponse::new).toList();
     }
 
     @Override

@@ -17,10 +17,12 @@ public interface ActivityService {
 
     Page<ActivityListResponse> list(Pageable pagination);
     Page<ActivityListResponse> listByDiscipline(Discipline discipline, Pageable pagination);
+    Page<ActivityListResponse> listByDisciplineAndName(Discipline discipline, String activity, Pageable pagination);
     ActivityRegisterResponse register(ActivityRegisterRequest request, Discipline discipline, User user);
     ActivityRegisterResponse edit(Activity activity, Discipline discipline, @Valid ActivityEditRequest request);
     Optional<Discipline> getDiscipline(Long id);
     Optional<User> getUser(Long id);
     Optional<Activity> getActivity(Long id);
     void delete(Long id);
+    Page<ActivityListResponse> listByName(String activity, Pageable pagination);
 }

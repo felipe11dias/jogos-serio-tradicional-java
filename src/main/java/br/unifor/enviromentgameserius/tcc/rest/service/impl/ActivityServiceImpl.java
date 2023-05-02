@@ -36,6 +36,12 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    public Page<ActivityListResponse> listByDisciplineAndName(Discipline discipline, String activity, Pageable pagination) {
+        Page<Activity> activities = repository.findByDisciplineAndName(discipline, activity, pagination);
+        return activities.map(ActivityListResponse::new);
+    }
+
+    @Override
     @Transactional
     public ActivityRegisterResponse register(
             ActivityRegisterRequest request,
@@ -106,7 +112,7 @@ public class ActivityServiceImpl implements ActivityService {
                 questionRepository.save(editQuestion.get());
                 answerRepository.saveAll(answers);
                 editQuestion.get().setAnswers(answers);
-                editQuestion.get().setIdAnswerCorrect(question.getAnswers().get(Long.valueOf(question.getIdAnswerCorrect()).intValue()).getId());
+                editQuestion.get().setIdAnswerCorrect(Long.valueOf(question.getIdAnswerCorrect()));
 
                 return editQuestion.get();
             }
@@ -130,6 +136,12 @@ public class ActivityServiceImpl implements ActivityService {
         if(activity.isPresent()) {
             repository.deleteById(id);
         }
+    }
+
+    @Override
+    public Page<ActivityListResponse> listByName(String activity, Pageable pagination) {
+        Page<Activity> activities = repository.findByNameContaining(activity, pagination);
+        return activities.map(ActivityListResponse::new);
     }
 
     @Override
