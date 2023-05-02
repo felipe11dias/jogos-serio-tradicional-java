@@ -12,23 +12,19 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ActivityListResponse {
-
+public class ActivityResponse {
     private Long id;
     private String name;
     private List<QuestionListResponse> questions;
-    private String discipline;
-    private Long idDiscipline;
-    private String user;
+    private String idDiscipline;
     private Long idUser;
 
-    public ActivityListResponse(Activity activity) {
+    public ActivityResponse(Activity activity) {
         this.id = activity.getId();
         this.name = activity.getName();
-        this.user = activity.getUser().getName();
         this.idUser = activity.getUser().getId();
-        this.discipline = activity.getDiscipline().getName();
-        this.idDiscipline = activity.getDiscipline().getId();
+        this.idDiscipline = activity.getDiscipline().getId().toString();
         this.questions = activity.getQuestions().stream().map(QuestionListResponse::new).toList();
     }
+
 }

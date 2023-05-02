@@ -2,16 +2,17 @@ package br.unifor.enviromentgameserius.tcc.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "ANSWER")
+@Table(name = "\"ANSWER\"")
 public class Answer {
 
     @Id
@@ -20,9 +21,10 @@ public class Answer {
     private Long id;
 
     @NotEmpty
-    @Column(name = "description")
     private String description;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "question_id")
     private Question question;
+
 }

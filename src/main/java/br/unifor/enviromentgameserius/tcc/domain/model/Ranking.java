@@ -1,40 +1,42 @@
 package br.unifor.enviromentgameserius.tcc.domain.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.sql.Timestamp;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "\"DISCIPLINE\"")
-public class Discipline {
+@Table(name = "\"RANKING\"")
+public class Ranking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "discipline_id")
+    @Column(name = "ranking_id")
     private Long id;
 
-    @NotEmpty
-    @Column(unique = true)
-    private String name;
+    @NotNull
+    private Timestamp time;
 
-    @NotEmpty
-    private String theme;
+//    @OneToMany
+//    @JoinColumn(name = "questionsHit")
+//    private List<Question> questionsHit;
 
-    @OneToMany(mappedBy = "discipline", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Activity> activities;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "activity_id")
+    private Activity activity;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "user_id")
     private User user;
+
 }

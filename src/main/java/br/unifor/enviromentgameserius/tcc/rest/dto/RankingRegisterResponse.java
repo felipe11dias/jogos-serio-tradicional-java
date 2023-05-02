@@ -1,23 +1,22 @@
 package br.unifor.enviromentgameserius.tcc.rest.dto;
 
-import br.unifor.enviromentgameserius.tcc.domain.model.Activity;
-import br.unifor.enviromentgameserius.tcc.domain.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DisciplineRegisterResponse {
+public class RankingRegisterResponse {
 
     private Long id;
-    private String name;
-    private String theme;
+    private Timestamp time;
+    private List<QuestionListResponse> questionsHit;
+    private String activity;
     private String user;
-    private List<Activity> activities;
 }

@@ -3,13 +3,16 @@ package br.unifor.enviromentgameserius.tcc.rest.controller;
 import br.unifor.enviromentgameserius.tcc.domain.model.Activity;
 import br.unifor.enviromentgameserius.tcc.domain.model.Discipline;
 import br.unifor.enviromentgameserius.tcc.domain.model.User;
-import br.unifor.enviromentgameserius.tcc.domain.repository.ActivityRepository;
-import br.unifor.enviromentgameserius.tcc.domain.repository.DisciplineRepository;
 import br.unifor.enviromentgameserius.tcc.rest.dto.*;
 import br.unifor.enviromentgameserius.tcc.rest.service.ActivityService;
+import br.unifor.enviromentgameserius.tcc.rest.service.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,26 +20,57 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/activities")
 @RequiredArgsConstructor
 public class ActivityController {
 
+    private final UserService userService;
     private final ActivityService service;
 
     @GetMapping()
-    public ResponseEntity<List<Activity>> list() {
-        return ResponseEntity.ok(service.list()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activities not found.")));
+    public ResponseEntity<Page<ActivityListResponse>> list(
+            @RequestParam(value = "activity", required = false) String activity,
+            @RequestParam(value = "page", defaultValue = "0") int page
+    ) throws ResponseStatusException {
+        Pageable pagination = PageRequest.of(page, 10, Sort.by("id").ascending());
+
+        if(activity == null) {
+            Page<ActivityListResponse> activities = service.list(pagination);
+            return ResponseEntity.ok(activities);
+        }
+
+        return ResponseEntity.ok(service.listByName(activity, pagination));
+    }
+
+    @GetMapping("/discipline/{idDiscipline}")
+    public ResponseEntity<Page<ActivityListResponse>> listByDiscipline(
+            @PathVariable(value = "idDiscipline") Long idDiscipline,
+            @RequestParam(value = "activity", required = false) String activity,
+            @RequestParam(value = "page", defaultValue = "0") int page
+    ) throws ResponseStatusException {
+        Discipline discipline = service.getDiscipline(idDiscipline)
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada."));
+
+        Pageable pagination = PageRequest.of(page, 10, Sort.by("id").ascending());
+
+        if(activity == null) {
+            Page<ActivityListResponse> activities = service.listByDiscipline(discipline, pagination);
+            return ResponseEntity.ok(activities);
+        }
+
+        return ResponseEntity.ok(service.listByDisciplineAndName(discipline, activity, pagination));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Activity> getActivity(@PathVariable(value = "id") Long id) {
-        return ResponseEntity.ok(service.getActivity(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found.")));
+    public ResponseEntity<ActivityResponse> getActivity(@PathVariable(value = "id") Long id) {
+        Activity activity = service.getActivity(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade não encontrada."));
+
+        ActivityResponse response = new ActivityResponse(activity);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("register")
@@ -45,15 +79,60 @@ public class ActivityController {
             @Valid @RequestBody ActivityRegisterRequest request,
             UriComponentsBuilder uriBuilder
     ) {
-        Discipline discipline = service.getDiscipline(request.getIdDiscipline())
-                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity register invalid. Discipline not found."));
+        Discipline discipline = service.getDiscipline(Long.valueOf(request.getIdDiscipline()))
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade é inválida. Disciplina não encontrada."));
 
         User user = service.getUser(request.getIdUser())
-                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity register invalid. User not found."));
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade é inválida. Usuário não encontrado."));
 
         ActivityRegisterResponse activity = service.register(request, discipline, user);
         URI uri = uriBuilder.path("/api/v1/activities/{id}").buildAndExpand(activity.getId()).toUri();
         return ResponseEntity.created(uri).body(activity);
+    }
+
+    @Transactional
+    @PutMapping("/{id}")
+    public ResponseEntity<ActivityRegisterResponse> edit(
+            @RequestHeader(name="authorization") String token,
+            @PathVariable(value = "id") Long id,
+            @Valid @RequestBody ActivityEditRequest request
+    ) throws ResponseStatusException {
+        Activity activity = service.getActivity(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade não encontrada."));
+
+        Discipline discipline = service.getDiscipline(Long.valueOf(request.getIdDiscipline()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada."));
+
+        User user = userService.getUserFromToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token informado é inválido."));
+
+        if(!Objects.equals(user.getId(), request.getIdUser())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário logado não tem permissão para essa ação.");
+        }
+
+        return ResponseEntity.ok().body(service.edit(activity, discipline, request));
+    }
+
+    @Transactional
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(
+            @RequestHeader(name="authorization") String token,
+            @PathVariable(value = "id") Long id
+    ) throws ResponseStatusException {
+        Activity activity = service.getActivity(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Atividade não encontrada."));
+
+        User user = userService.getUserFromToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token informado é inválido."));
+
+        if(!Objects.equals(user.getId(), activity.getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário logado não tem permissão para essa ação.");
+        }
+
+        service.delete(id);
+
+        return ResponseEntity.ok().build();
+
     }
 
 }

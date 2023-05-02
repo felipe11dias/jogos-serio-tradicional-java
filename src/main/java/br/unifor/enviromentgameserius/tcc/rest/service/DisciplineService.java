@@ -5,16 +5,21 @@ import br.unifor.enviromentgameserius.tcc.domain.model.User;
 import br.unifor.enviromentgameserius.tcc.rest.dto.DisciplineListResponse;
 import br.unifor.enviromentgameserius.tcc.rest.dto.DisciplineRegisterRequest;
 import br.unifor.enviromentgameserius.tcc.rest.dto.DisciplineRegisterResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface DisciplineService {
 
-    Optional<List<Discipline>> list();
+    Page<DisciplineListResponse> list(Pageable pagination);
+    Page<DisciplineListResponse> listByName(String discipline, Pageable pagination);
     DisciplineRegisterResponse register(DisciplineRegisterRequest request, User user);
+    DisciplineRegisterResponse edit(Discipline discipline, DisciplineRegisterRequest request);
+    void delete(Long id);
     DisciplineRegisterResponse details(Discipline discipline);
     Optional<User> getUser(Long id);
     Optional<Discipline> getDiscipline(Long id);
-
+    List<DisciplineListResponse> listToSelection();
 }
