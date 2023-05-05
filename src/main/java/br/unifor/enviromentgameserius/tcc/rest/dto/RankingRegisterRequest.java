@@ -6,19 +6,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RankingRegisterRequest {
 
-    @NotNull(message = "Tempo é obrigatório")
-    private Timestamp time;
+    @NotNull(message = "Nome do jogo é obrigatório")
+    private String game;
 
-    private List<Long> questionsHit;
+    @NotNull(message = "Tempo de finalização de jogo da atividade é obrigatório")
+    private String time;
+
+    @NotNull(message = "Tempo final de finalização do jogo da atividade é obrigatório")
+    private String fullTime;
+
+    @NotNull(message = "Quantidade de questões corretas é obrigatório")
+    private Integer questionsHit;
 
     @NotNull(message = "Atividade é obrigatório")
     private Long idActivity;

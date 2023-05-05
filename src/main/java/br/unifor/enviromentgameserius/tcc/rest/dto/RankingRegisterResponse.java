@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,8 +12,10 @@ import java.util.List;
 public class RankingRegisterResponse {
 
     private Long id;
-    private Timestamp time;
-    private List<QuestionListResponse> questionsHit;
+    private String game;
+    private String time;
+    private String fullTime;
+    private Integer questionsHit;
     private String activity;
     private String user;
 }
