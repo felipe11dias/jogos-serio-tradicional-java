@@ -1,9 +1,9 @@
 # Estágio 1: Construir o aplicativo Spring Boot com Java
 FROM maven:3.8.4 AS build
+RUN apt-get install -y maven
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package
+COPY . .
+RUN --mount=type=cache,target=/root/.m2/repository mvn -e -B clean package -Dmaven.test.skip=true
 
 # Estágio 2: Construir a imagem final
 FROM openjdk:11-jre-slim
@@ -34,4 +34,5 @@ COPY src/main/resources/static/jogos-serios-tradicionais.sql /docker-entrypoint-
 # EXPOSE 8080
 
 # Comando de inicialização do aplicativo Spring Boot
-CMD ["java", "-jar", "/app.jar"]
+CMD ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "/app.jar"]
+
