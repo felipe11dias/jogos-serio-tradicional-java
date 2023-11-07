@@ -1,5 +1,3 @@
-Dockerfile
-Copy code
 # Estágio 1: Construir o aplicativo Spring Boot com Java
 FROM maven:3.8.4 AS build
 WORKDIR /app
