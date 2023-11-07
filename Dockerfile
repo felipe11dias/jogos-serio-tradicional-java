@@ -1,4 +1,5 @@
 # Estágio 1: Construir o aplicativo Spring Boot com Java
+FROM ubuntu:14.04.4
 FROM maven:3.8.4 AS build
 RUN apt-get update
 RUN apt-get install -y maven
