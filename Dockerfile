@@ -1,11 +1,11 @@
 # Estágio 1: Construir o aplicativo Spring Boot com Java
-FROM ubuntu:14.04.4
 FROM maven:3.8.4 AS build
-RUN apt-get -y update
-RUN apt-get install -y maven
+
+RUN apt-get update -y
 WORKDIR /app
-COPY . .
-RUN --mount=type=cache,target=/root/.m2/repository mvn -e -B clean package -Dmaven.test.skip=true
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package
 
 # Estágio 2: Construir a imagem final
 FROM openjdk:11-jre-slim
