@@ -19,7 +19,7 @@ public class RankingRegisterRequest {
     private String time;
 
     @NotNull(message = "Tempo final de finalização do jogo da atividade é obrigatório")
-    private String fullTime;
+    private String fulltime;
 
     @NotNull(message = "Quantidade de questões corretas é obrigatório")
     private Integer questionsHit;

@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface RankingRepository extends JpaRepository<Ranking, Long> {
 
-    Optional<Ranking> findByUserAndActivity(User user, Activity activity);
+    Optional<Ranking> findByUserAndActivityAndGame(User user, Activity activity, String game);
 }

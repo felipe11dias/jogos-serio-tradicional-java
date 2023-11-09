@@ -1,7 +1,6 @@
 package br.unifor.enviromentgameserius.tcc.rest.controller;
 
 import br.unifor.enviromentgameserius.tcc.domain.model.Activity;
-import br.unifor.enviromentgameserius.tcc.domain.model.Ranking;
 import br.unifor.enviromentgameserius.tcc.domain.model.User;
 import br.unifor.enviromentgameserius.tcc.rest.dto.RankingListResponse;
 import br.unifor.enviromentgameserius.tcc.rest.dto.RankingRegisterRequest;
@@ -23,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/ratings")
@@ -44,9 +42,21 @@ public class RankingController {
         return ResponseEntity.ok(ratings);
     }
 
+//    @Transactional
+//    @DeleteMapping("/delete/{id}")
+//    public ResponseEntity<?> delete(
+//            @PathVariable(name = "id") Long id
+//    ) {
+//        Ranking ranking = service.getRanking(id)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Classificação ainda não existe para esse jogo."));
+//
+//        service.delete(ranking.getId());
+//        return ResponseEntity.noContent().build();
+//    }
+
     @Transactional
-    @PostMapping("/register-or-edit")
-    public ResponseEntity<RankingRegisterResponse> registerOrEdit(
+    @PostMapping("/register")
+    public ResponseEntity<RankingRegisterResponse> register(
             @Valid @RequestBody RankingRegisterRequest request,
             UriComponentsBuilder uriBuilder
     ) throws ResponseStatusException {
@@ -55,9 +65,6 @@ public class RankingController {
 
         Activity activity = activityService.getActivity(request.getIdActivity())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Classificação é inválida. Atividade não encontrada."));
-
-        Optional<Ranking> rankingOptional = service.getRankinByUserAndActivity(user, activity);
-        rankingOptional.ifPresent(ranking -> service.delete(ranking.getId()));
 
         RankingRegisterResponse ranking = service.register(request, user, activity);
         URI uri = uriBuilder.path("/api/v1/ratings/{id}").buildAndExpand(ranking.getId()).toUri();

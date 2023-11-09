@@ -38,6 +38,16 @@ CREATE TABLE "ACTIVITY" (
   "user_id" bigint
 );
 
+CREATE TABLE "RANKING" (
+  "ranking_id" BIGSERIAL PRIMARY KEY,
+  "questions_hit" bigint,
+  "game" varchar,
+  "time" varchar,
+  "fulltime" varchar,
+  "activity_id" bigint,
+  "user_id" bigint
+);
+
 CREATE TABLE "QUESTION" (
   "question_id" BIGSERIAL PRIMARY KEY,
   "description" varchar,
@@ -58,6 +68,10 @@ ALTER TABLE "DISCIPLINE" ADD FOREIGN KEY ("user_id") REFERENCES "USER" ("user_id
 ALTER TABLE "ACTIVITY" ADD FOREIGN KEY ("discipline_id") REFERENCES "DISCIPLINE" ("discipline_id");
 
 ALTER TABLE "ACTIVITY" ADD FOREIGN KEY ("user_id") REFERENCES "USER" ("user_id");
+
+ALTER TABLE "RANKING" ADD FOREIGN KEY ("activity_id") REFERENCES "ACTIVITY" ("activity_id");
+
+ALTER TABLE "RANKING" ADD FOREIGN KEY ("user_id") REFERENCES "USER" ("user_id");
 
 ALTER TABLE "QUESTION" ADD FOREIGN KEY ("activity_id") REFERENCES "ACTIVITY" ("activity_id");
 

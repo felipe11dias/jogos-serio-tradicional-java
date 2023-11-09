@@ -34,9 +34,11 @@ public class RankingServiceImpl implements RankingService {
         Ranking ranking = Ranking.builder()
                 .game(request.getGame())
                 .time(request.getTime())
-                .fullTime(request.getFullTime())
+                .fulltime(request.getFulltime())
                 .questionsHit(request.getQuestionsHit())
-                .activity(activity)
+                .questions(activity.getQuestions().size())
+                .discipline(activity.getDiscipline().getName())
+                .activity(activity.getName())
                 .user(user)
                 .build();
 
@@ -45,36 +47,35 @@ public class RankingServiceImpl implements RankingService {
         return RankingRegisterResponse.builder()
                 .game(ranking.getGame())
                 .time(ranking.getTime())
-                .fullTime(ranking.getFullTime())
+                .fulltime(ranking.getFulltime())
                 .questionsHit(ranking.getQuestionsHit())
-                .activity(ranking.getActivity().getName())
+                .questions(ranking.getQuestions())
+                .discipline(ranking.getDiscipline())
+                .activity(ranking.getActivity())
                 .user(ranking.getUser().getName())
                 .build();
     }
 
     @Override
     @Transactional
-    public RankingRegisterResponse edit(RankingRegisterRequest request, Ranking ranking, User user, Activity activity) {
+    public RankingRegisterResponse edit(RankingRegisterRequest request, Ranking ranking, User user) {
         ranking.setGame(request.getGame());
         ranking.setTime(request.getTime());
-        ranking.setFullTime(request.getFullTime());
+        ranking.setFulltime(request.getFulltime());
         ranking.setQuestionsHit(request.getQuestionsHit());
         ranking.setUser(user);
-        ranking.setActivity(activity);
 
         repository.save(ranking);
 
         return RankingRegisterResponse.builder()
                 .game(ranking.getGame())
                 .time(ranking.getTime())
-                .fullTime(ranking.getFullTime())
+                .fulltime(ranking.getFulltime())
                 .questionsHit(ranking.getQuestionsHit())
-                .activity(ranking.getActivity().getName())
                 .user(ranking.getUser().getName())
                 .build();
     }
 
-    @Transactional
     public void delete(Long id) {
         Optional<Ranking> ranking = repository.findById(id);
         if(ranking.isPresent()) {
@@ -83,8 +84,8 @@ public class RankingServiceImpl implements RankingService {
     }
 
     @Override
-    public Optional<Ranking> getRankinByUserAndActivity(User user, Activity activity) {
-        return repository.findByUserAndActivity(user, activity);
+    public Optional<Ranking> getRanking(Long id) {
+        return Optional.of(repository.findById(id)).get();
     }
 
 }

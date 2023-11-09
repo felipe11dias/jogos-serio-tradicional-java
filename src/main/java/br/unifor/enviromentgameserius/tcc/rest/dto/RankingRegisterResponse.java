@@ -14,8 +14,10 @@ public class RankingRegisterResponse {
     private Long id;
     private String game;
     private String time;
-    private String fullTime;
+    private String fulltime;
     private Integer questionsHit;
+    private Integer questions;
+    private String discipline;
     private String activity;
     private String user;
 }

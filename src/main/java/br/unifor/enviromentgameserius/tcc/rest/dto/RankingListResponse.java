@@ -17,15 +17,19 @@ public class RankingListResponse {
     private String time;
     private String fulltime;
     private Integer questionsHit;
+    private Integer questions;
+    private String discipline;
     private String activity;
     private String user;
 
     public RankingListResponse(Ranking ranking) {
         this.game = ranking.getGame();
         this.time = ranking.getTime();
-        this.fulltime = ranking.getFullTime();
+        this.fulltime = ranking.getFulltime();
         this.questionsHit = ranking.getQuestionsHit();
-        this.activity = ranking.getActivity().getName();
+        this.questions = ranking.getQuestions();
+        this.discipline = ranking.getDiscipline();
+        this.activity = ranking.getActivity();
         this.user = ranking.getUser().getName();
     }
 }

@@ -23,19 +23,25 @@ public class Ranking {
     @NotNull(message = "Nome do jogo é obrigatório")
     private String game;
 
+    @NotNull(message = "Disciplina do jogo é obrigatório")
+    private String discipline;
+
+    @NotNull(message = "Atividade do jogo é obrigatório")
+    private String activity;
+
     @NotNull(message = "Tempo de finalização de jogo da atividade é obrigatório")
     private String time;
 
     @NotNull(message = "Tempo final de finalização do jogo da atividade é obrigatório")
-    private String fullTime;
+    private String fulltime;
 
     @NotNull(message = "Quantidade de questões corretas é obrigatório")
+    @Column(name = "questions_hit")
     private Integer questionsHit;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "activity_id")
-    private Activity activity;
+    @NotNull(message = "Quantidade de questões da atividade é obrigatório")
+    @Column(name = "questions")
+    private Integer questions;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)

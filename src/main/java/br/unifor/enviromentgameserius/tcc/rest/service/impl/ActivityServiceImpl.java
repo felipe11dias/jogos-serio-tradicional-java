@@ -59,7 +59,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         var questions = request.getQuestions().stream().map(question -> {
             Question registerQuestion = Question.builder()
-                    .description(question.getDescription())
+                    .description(question.getDescription() + " ?")
                     .answers(Collections.emptyList())
                     .idAnswerCorrect(-1L)
                     .activity(activity)

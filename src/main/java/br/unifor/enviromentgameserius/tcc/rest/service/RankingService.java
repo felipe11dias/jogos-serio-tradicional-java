@@ -15,7 +15,7 @@ public interface RankingService {
 
     Page<RankingListResponse> list(Pageable pagination);
     RankingRegisterResponse register(RankingRegisterRequest request, User user, Activity activity);
-    RankingRegisterResponse edit(RankingRegisterRequest request, Ranking ranking, User user, Activity activity);
+    RankingRegisterResponse edit(RankingRegisterRequest request, Ranking ranking, User user);
     void delete(Long id);
-    Optional<Ranking> getRankinByUserAndActivity(User user, Activity activity);
+    Optional<Ranking> getRanking(Long id);
 }
