@@ -13,7 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import static org.springframework.http.HttpMethod.GET;
+
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
@@ -48,11 +49,13 @@ public class SecurityConfig {
                     .permitAll()
                 .requestMatchers("/api/v1/ranking/**")
                     .hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name())
-                .requestMatchers(GET, "/api/v1/disciplines/**")
+                .requestMatchers(GET, "/api/v1/disciplines/**", "/api/v1/activities/**")
                     .hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name())
-                .requestMatchers(GET, "/api/v1/activities/**")
-                    .hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name())
-                .requestMatchers("/api/v1/disciplines/**", "/api/v1/activities/**")
+                .requestMatchers(POST, "/api/v1/disciplines/**", "/api/v1/activities/**")
+                    .hasAuthority(Role.TEACHER.name())
+                .requestMatchers(PUT, "/api/v1/disciplines/**", "/api/v1/activities/**")
+                    .hasAuthority(Role.TEACHER.name())
+                .requestMatchers(DELETE, "/api/v1/disciplines/**", "/api/v1/activities/**")
                     .hasAuthority(Role.TEACHER.name())
             .anyRequest()
                 .authenticated()
