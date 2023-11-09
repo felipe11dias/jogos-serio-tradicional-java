@@ -1,5 +1,5 @@
 # Stage 1: Builda a aplicação 
-FROM maven:3.8.4 AS build
+FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src src/
