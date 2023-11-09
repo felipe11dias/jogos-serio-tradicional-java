@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**", "/api/v1/users/**")
                     .permitAll()
                 .requestMatchers("/api/v1/ranking/**")
-                    .hasAuthority(Role.STUDENT.name())
+                    .hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name())
                 .requestMatchers(GET, "/api/v1/disciplines/**")
                     .hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name())
                 .requestMatchers(GET, "/api/v1/activities/**")

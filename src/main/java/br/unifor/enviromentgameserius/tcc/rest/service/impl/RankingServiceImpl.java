@@ -1,21 +1,19 @@
 package br.unifor.enviromentgameserius.tcc.rest.service.impl;
 
 import br.unifor.enviromentgameserius.tcc.domain.model.Activity;
-import br.unifor.enviromentgameserius.tcc.domain.model.Question;
 import br.unifor.enviromentgameserius.tcc.domain.model.Ranking;
 import br.unifor.enviromentgameserius.tcc.domain.model.User;
-import br.unifor.enviromentgameserius.tcc.domain.repository.QuestionRepository;
 import br.unifor.enviromentgameserius.tcc.domain.repository.RankingRepository;
+import br.unifor.enviromentgameserius.tcc.rest.dto.RankingListResponse;
 import br.unifor.enviromentgameserius.tcc.rest.dto.RankingRegisterRequest;
 import br.unifor.enviromentgameserius.tcc.rest.dto.RankingRegisterResponse;
 import br.unifor.enviromentgameserius.tcc.rest.service.RankingService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,38 +21,71 @@ import java.util.Optional;
 public class RankingServiceImpl implements RankingService {
 
     private final RankingRepository repository;
-    private final QuestionRepository questionRepository;
+
+    @Override
+    public Page<RankingListResponse> list(Pageable pagination) {
+        Page<Ranking> ratings = repository.findAll(pagination);
+        return ratings.map(RankingListResponse::new);
+    }
 
     @Override
     @Transactional
-    public RankingRegisterResponse register(RankingRegisterRequest request, List<Question> questions, User user, Activity activity) {
+    public RankingRegisterResponse register(RankingRegisterRequest request, User user, Activity activity) {
         Ranking ranking = Ranking.builder()
+                .game(request.getGame())
                 .time(request.getTime())
-                //.questionsHit(questions)
-                .activity(activity)
+                .fulltime(request.getFulltime())
+                .questionsHit(request.getQuestionsHit())
+                .questions(activity.getQuestions().size())
+                .discipline(activity.getDiscipline().getName())
+                .activity(activity.getName())
                 .user(user)
                 .build();
 
         repository.save(ranking);
 
         return RankingRegisterResponse.builder()
+                .game(ranking.getGame())
                 .time(ranking.getTime())
-                .activity(ranking.getActivity().getName())
+                .fulltime(ranking.getFulltime())
+                .questionsHit(ranking.getQuestionsHit())
+                .questions(ranking.getQuestions())
+                .discipline(ranking.getDiscipline())
+                .activity(ranking.getActivity())
                 .user(ranking.getUser().getName())
-                //.questionsHit(ranking.getQuestionsHit().stream().map(QuestionListResponse::new).toList())
                 .build();
     }
 
     @Override
-    public List<Question> getQuestions(List<Long> idQuestions) {
-        return idQuestions.stream().map(id -> {
-            Optional<Question> questionOptional = questionRepository.findById(id);
-            if(questionOptional.isPresent()) {
-                return questionOptional.get();
-            }
+    @Transactional
+    public RankingRegisterResponse edit(RankingRegisterRequest request, Ranking ranking, User user) {
+        ranking.setGame(request.getGame());
+        ranking.setTime(request.getTime());
+        ranking.setFulltime(request.getFulltime());
+        ranking.setQuestionsHit(request.getQuestionsHit());
+        ranking.setUser(user);
 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ranking inválido. Questão não encontrada.");
-        }).toList();
+        repository.save(ranking);
+
+        return RankingRegisterResponse.builder()
+                .game(ranking.getGame())
+                .time(ranking.getTime())
+                .fulltime(ranking.getFulltime())
+                .questionsHit(ranking.getQuestionsHit())
+                .user(ranking.getUser().getName())
+                .build();
+    }
+
+    public void delete(Long id) {
+        Optional<Ranking> ranking = repository.findById(id);
+        if(ranking.isPresent()) {
+            repository.deleteById(id);
+        }
+    }
+
+    @Override
+    public Optional<Ranking> getRanking(Long id) {
+        return Optional.of(repository.findById(id)).get();
     }
 
 }

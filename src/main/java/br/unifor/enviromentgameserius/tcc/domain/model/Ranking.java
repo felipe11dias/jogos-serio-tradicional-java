@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,17 +20,28 @@ public class Ranking {
     @Column(name = "ranking_id")
     private Long id;
 
-    @NotNull
-    private Timestamp time;
+    @NotNull(message = "Nome do jogo é obrigatório")
+    private String game;
 
-//    @OneToMany
-//    @JoinColumn(name = "questionsHit")
-//    private List<Question> questionsHit;
+    @NotNull(message = "Disciplina do jogo é obrigatório")
+    private String discipline;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "activity_id")
-    private Activity activity;
+    @NotNull(message = "Atividade do jogo é obrigatório")
+    private String activity;
+
+    @NotNull(message = "Tempo de finalização de jogo da atividade é obrigatório")
+    private String time;
+
+    @NotNull(message = "Tempo final de finalização do jogo da atividade é obrigatório")
+    private String fulltime;
+
+    @NotNull(message = "Quantidade de questões corretas é obrigatório")
+    @Column(name = "questions_hit")
+    private Integer questionsHit;
+
+    @NotNull(message = "Quantidade de questões da atividade é obrigatório")
+    @Column(name = "questions")
+    private Integer questions;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)

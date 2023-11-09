@@ -26,13 +26,8 @@ public class Question {
     @NotEmpty
     private String description;
 
-
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Answer> answers;
-
-//    @ManyToOne
-//    @JoinColumn(name = "ranking_id")
-//    private Ranking ranking;
 
     @ManyToOne
     @JoinColumn(name = "activity_id")
