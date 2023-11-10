@@ -48,9 +48,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**", "/api/v1/users/**")
                     .permitAll()
                 .requestMatchers("/api/v1/ranking/**")
-                    .hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name())
+                    .permitAll()
                 .requestMatchers(GET, "/api/v1/disciplines/**", "/api/v1/activities/**")
-                    .hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name())
+                    .permitAll()
                 .requestMatchers(POST, "/api/v1/disciplines/**", "/api/v1/activities/**")
                     .hasAuthority(Role.TEACHER.name())
                 .requestMatchers(PUT, "/api/v1/disciplines/**", "/api/v1/activities/**")
@@ -69,8 +69,8 @@ public class SecurityConfig {
             .logoutUrl("/api/v1/auth/logout")
             .addLogoutHandler(logoutHandler)
             .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()
-            ).and().cors().disable()
-        ;
+            )
+            .and().cors();
 
         return http.build();
     }
