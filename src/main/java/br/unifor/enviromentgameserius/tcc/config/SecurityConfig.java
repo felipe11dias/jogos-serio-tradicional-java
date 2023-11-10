@@ -70,7 +70,7 @@ public class SecurityConfig {
             .addLogoutHandler(logoutHandler)
             .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()
             )
-            .and().cors();
+            .and().cors().disable();
 
         return http.build();
     }
