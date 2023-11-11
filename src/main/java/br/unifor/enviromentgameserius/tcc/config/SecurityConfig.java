@@ -45,9 +45,7 @@ public class SecurityConfig {
                         "/error"
                 )
                     .permitAll()
-                .requestMatchers("/api/v1/auth/**", "/api/v1/users/**")
-                    .permitAll()
-                .requestMatchers("/api/v1/ranking/**")
+                .requestMatchers("/api/v1/auth/**", "/api/v1/users/**", "/api/v1/ranking/**")
                     .permitAll()
                 .requestMatchers(GET, "/api/v1/disciplines/**", "/api/v1/activities/**")
                     .permitAll()

@@ -44,6 +44,7 @@ CREATE TABLE "RANKING" (
   "game" varchar,
   "time" varchar,
   "fulltime" varchar,
+  "discipline_id" bigint,
   "activity_id" bigint,
   "user_id" bigint
 );

@@ -27,6 +27,7 @@ public class Ranking {
     private String discipline;
 
     @NotNull(message = "Atividade do jogo é obrigatório")
+    @Column(name = "activity_id")
     private String activity;
 
     @NotNull(message = "Tempo de finalização de jogo da atividade é obrigatório")
