@@ -30,7 +30,10 @@ public class JwtService {
     }
 
     public String extractUsernameBearer(String token) {
-        final String jwt = token.split(" ")[1].trim();
+        String jwt = "isTokenInvalid";
+        if(token != null && !token.isEmpty() && token.split(" ").length > 1) {
+            jwt = token.split(" ")[1].trim();
+        }
         return extractClaim(jwt, Claims::getSubject);
     }
 
